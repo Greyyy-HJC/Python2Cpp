@@ -1,0 +1,1 @@
+g++ -shared -o example.so -fPIC example.cpp
