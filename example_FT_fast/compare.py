@@ -3,52 +3,29 @@ import numpy as np
 from py_fourier import fourier
 
 
+# Set the value of nconf to 1500
 nconf = 1500
+
+# Set the value of zmax to 23
 zmax = 23
+
+# Calculate the values of lam using the formula 0.12 / 0.197 * 2.15 * np.arange(zmax)
 lam = 0.12 / 0.197 * 2.15 * np.arange(zmax)
+
+# Generate a random array fz_r with shape (nconf, zmax)
 fz_r = np.random.rand(nconf, zmax)
+
+# Generate a random array fz_i with shape (nconf, zmax)
 fz_i = np.random.rand(nconf, zmax)
+
+# Generate an array x with values ranging from -0.5 to 2.0 with a step size of 0.01 and shape (201,)
 x = -0.5 + 0.01 * np.arange(201)
 
+# Call the function fourier with the arguments lam, fz_r, fz_i, and x and assign the returned values to fp_r and fp_i
 fp_r, fp_i = fourier(lam, fz_r, fz_i, x)
 
 
-import ctypes
-
-
-# Load the shared library and set the function signature
-class FourierLib:
-    def __init__(self, path="./matrix_fourier.so"):
-        self.lib = ctypes.CDLL(path)
-        self._set_argtypes()
-
-    def _set_argtypes(self):
-        argtype = np.ctypeslib.ndpointer(dtype=np.double, flags="C_CONTIGUOUS")
-        self.lib.fourier.argtypes = [
-            argtype,
-            argtype,
-            argtype,
-            ctypes.c_int,
-            argtype,
-            ctypes.c_int,
-            argtype,
-            argtype,
-        ]
-
-    def fourier(self, lam, fz_r, fz_i, x):
-        len_fz = len(fz_r)
-        len_x = len(x)
-
-        # Create empty arrays for output
-        output_real = np.empty(len_x, dtype=np.double)
-        output_imag = np.empty(len_x, dtype=np.double)
-
-        # Call the C++ function
-        self.lib.fourier(lam, fz_r, fz_i, len_fz, x, len_x, output_real, output_imag)
-
-        return output_real, output_imag
-
-
+from module import FourierLib
 import timeit
 
 
